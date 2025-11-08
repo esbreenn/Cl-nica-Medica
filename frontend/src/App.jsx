@@ -18,7 +18,7 @@ export default function App() {
         <header className="mb-8 flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-3xl font-semibold tracking-tight text-slate-900">
-              Clínica · Gestión
+              Clínica · MESIS
             </h1>
             <p className="mt-1 text-sm text-slate-600">
               Administra pacientes, turnos y operaciones diarias con un vistazo.

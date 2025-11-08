@@ -150,71 +150,7 @@ export default function Turnos() {
 
   return (
     <div className="space-y-10">
-      {/* Filtros */}
-      <section className="space-y-4 rounded-2xl border border-slate-200 bg-slate-50/70 p-4 shadow-sm">
-        <div>
-          <h3 className="text-lg font-semibold text-slate-800">Filtros</h3>
-          <p className="mt-1 text-sm text-slate-600">
-            Ajusta los criterios para encontrar turnos específicos por profesional, estado o rango de fechas.
-          </p>
-        </div>
-
-        <div className="grid gap-3 md:grid-cols-5">
-          <select
-            value={filtro.profesional_id}
-            onChange={(e) => setFiltro({ ...filtro, profesional_id: e.target.value })}
-            className={`${baseFieldClasses} md:col-span-2`}
-          >
-            <option value="">Filtrar profesional</option>
-            {profesionales.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.nombre}
-              </option>
-            ))}
-          </select>
-
-          <select
-            value={filtro.estado}
-            onChange={(e) => setFiltro({ ...filtro, estado: e.target.value })}
-            className={baseFieldClasses}
-          >
-            <option value="">Estado</option>
-            {estadoOpciones.map((estado) => (
-              <option key={estado} value={estado}>
-                {estado}
-              </option>
-            ))}
-          </select>
-
-          <input
-            type="datetime-local"
-            value={filtro.desde}
-            onChange={(e) => setFiltro({ ...filtro, desde: e.target.value })}
-            className={baseFieldClasses}
-          />
-          <input
-            type="datetime-local"
-            value={filtro.hasta}
-            onChange={(e) => setFiltro({ ...filtro, hasta: e.target.value })}
-            className={baseFieldClasses}
-          />
-          <input
-            placeholder="DNI paciente"
-            value={filtro.paciente_dni}
-            onChange={(e) => setFiltro({ ...filtro, paciente_dni: e.target.value })}
-            className={baseFieldClasses}
-          />
-        </div>
-
-        <div className="flex flex-wrap gap-3">
-          <button type="button" onClick={aplicarFiltros} className={primaryButton}>
-            Aplicar filtros
-          </button>
-          <button type="button" onClick={limpiarFiltros} className={subtleButton}>
-            Limpiar
-          </button>
-        </div>
-      </section>
+     
 
       {/* Alta */}
       <section className="space-y-6">
@@ -412,7 +348,73 @@ export default function Turnos() {
             </table>
           </div>
         </div>
+         {/* Filtros */}
+      <section className="space-y-4 rounded-2xl border border-slate-200 bg-slate-50/70 p-4 shadow-sm">
+        <div>
+          <h3 className="text-lg font-semibold text-slate-800">Filtros</h3>
+          <p className="mt-1 text-sm text-slate-600">
+            Ajusta los criterios para encontrar turnos específicos por profesional, estado o rango de fechas.
+          </p>
+        </div>
+
+        <div className="grid gap-3 md:grid-cols-5">
+          <select
+            value={filtro.profesional_id}
+            onChange={(e) => setFiltro({ ...filtro, profesional_id: e.target.value })}
+            className={`${baseFieldClasses} md:col-span-2`}
+          >
+            <option value="">Filtrar profesional</option>
+            {profesionales.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.nombre}
+              </option>
+            ))}
+          </select>
+
+          <select
+            value={filtro.estado}
+            onChange={(e) => setFiltro({ ...filtro, estado: e.target.value })}
+            className={baseFieldClasses}
+          >
+            <option value="">Estado</option>
+            {estadoOpciones.map((estado) => (
+              <option key={estado} value={estado}>
+                {estado}
+              </option>
+            ))}
+          </select>
+
+          <input
+            type="datetime-local"
+            value={filtro.desde}
+            onChange={(e) => setFiltro({ ...filtro, desde: e.target.value })}
+            className={baseFieldClasses}
+          />
+          <input
+            type="datetime-local"
+            value={filtro.hasta}
+            onChange={(e) => setFiltro({ ...filtro, hasta: e.target.value })}
+            className={baseFieldClasses}
+          />
+          <input
+            placeholder="DNI paciente"
+            value={filtro.paciente_dni}
+            onChange={(e) => setFiltro({ ...filtro, paciente_dni: e.target.value })}
+            className={baseFieldClasses}
+          />
+        </div>
+
+        <div className="flex flex-wrap gap-3">
+          <button type="button" onClick={aplicarFiltros} className={primaryButton}>
+            Aplicar filtros
+          </button>
+          <button type="button" onClick={limpiarFiltros} className={subtleButton}>
+            Limpiar
+          </button>
+        </div>
+      </section>
       </section>
     </div>
+    
   );
 }
