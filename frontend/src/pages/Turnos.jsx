@@ -1,5 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { api } from "../api/axios";
+
+const baseFieldClasses =
+  "w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 shadow-sm transition focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500/60 disabled:cursor-not-allowed disabled:opacity-60";
+
+const subtleButton =
+  "inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-500 disabled:cursor-not-allowed disabled:opacity-60";
+
+const primaryButton =
+  "inline-flex items-center justify-center gap-2 rounded-lg bg-sky-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-sky-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-500 disabled:cursor-not-allowed disabled:bg-sky-300";
 
 export default function Turnos() {
   const [pacientes, setPacientes] = useState([]);
@@ -134,158 +143,276 @@ export default function Turnos() {
   }
 
   // -------- UI ----------
+  const estadoOpciones = useMemo(
+    () => ["reservado", "confirmado", "atendido", "cancelado", "ausente"],
+    [],
+  );
+
   return (
-    <div>
-      <h2>Turnos</h2>
-
+    <div className="space-y-10">
       {/* Filtros */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr 1fr", gap: 8, margin: "12px 0" }}>
-        <select
-          value={filtro.profesional_id}
-          onChange={(e) => setFiltro({ ...filtro, profesional_id: e.target.value })}
-        >
-          <option value="">Filtrar profesional</option>
-          {profesionales.map((p) => (
-            <option key={p.id} value={p.id}>
-              {p.nombre}
-            </option>
-          ))}
-        </select>
-
-        <select value={filtro.estado} onChange={(e) => setFiltro({ ...filtro, estado: e.target.value })}>
-          <option value="">Estado</option>
-          <option value="reservado">reservado</option>
-          <option value="confirmado">confirmado</option>
-          <option value="atendido">atendido</option>
-          <option value="cancelado">cancelado</option>
-          <option value="ausente">ausente</option>
-        </select>
-
-        <input
-          type="datetime-local"
-          value={filtro.desde}
-          onChange={(e) => setFiltro({ ...filtro, desde: e.target.value })}
-        />
-        <input
-          type="datetime-local"
-          value={filtro.hasta}
-          onChange={(e) => setFiltro({ ...filtro, hasta: e.target.value })}
-        />
-        <input
-          placeholder="DNI paciente"
-          value={filtro.paciente_dni}
-          onChange={(e) => setFiltro({ ...filtro, paciente_dni: e.target.value })}
-        />
-      </div>
-      <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
-        <button onClick={aplicarFiltros}>Aplicar filtros</button>
-        <button onClick={limpiarFiltros}>Limpiar</button>
-      </div>
-
-      {/* Alta */}
-      <form onSubmit={onSubmit} style={{ display: "grid", gap: 8, maxWidth: 620, marginBottom: 16 }}>
-        <select name="paciente_id" value={form.paciente_id} onChange={onChange} required>
-          <option value="">Paciente</option>
-          {pacientes.map((p) => (
-            <option key={p.id} value={p.id}>
-              {p.dni} - {p.nombre} {p.apellido}
-            </option>
-          ))}
-        </select>
-
-        <select name="profesional_id" value={form.profesional_id} onChange={onChange} required>
-          <option value="">Profesional</option>
-          {profesionales.map((p) => (
-            <option key={p.id} value={p.id}>
-              {p.nombre} ({p.especialidad})
-            </option>
-          ))}
-        </select>
-
-        <select name="servicio_id" value={form.servicio_id} onChange={onChange} required>
-          <option value="">Servicio</option>
-          {servicios.map((s) => (
-            <option key={s.id} value={s.id}>
-              {s.nombre} ({s.duracion_min}m)
-            </option>
-          ))}
-        </select>
-
-        <select name="sucursal_id" value={form.sucursal_id} onChange={onChange} required>
-          <option value="">Sucursal</option>
-          {sucursales.map((s) => (
-            <option key={s.id} value={s.id}>
-              {s.nombre}
-            </option>
-          ))}
-        </select>
-
-        <input
-          name="fecha_hora_inicio"
-          type="datetime-local"
-          value={form.fecha_hora_inicio}
-          onChange={onChange}
-          required
-        />
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-          <input
-            name="monto"
-            type="number"
-            step="0.01"
-            value={form.monto}
-            onChange={onChange}
-            placeholder="Monto (opcional)"
-          />
-          <select name="metodo" value={form.metodo} onChange={onChange}>
-            <option value="efectivo">efectivo</option>
-            <option value="debito">debito</option>
-            <option value="credito">credito</option>
-            <option value="mp">mp</option>
-          </select>
+      <section className="space-y-4 rounded-2xl border border-slate-200 bg-slate-50/70 p-4 shadow-sm">
+        <div>
+          <h3 className="text-lg font-semibold text-slate-800">Filtros</h3>
+          <p className="mt-1 text-sm text-slate-600">
+            Ajusta los criterios para encontrar turnos específicos por profesional, estado o rango de fechas.
+          </p>
         </div>
 
-        <button>Crear turno</button>
-      </form>
+        <div className="grid gap-3 md:grid-cols-5">
+          <select
+            value={filtro.profesional_id}
+            onChange={(e) => setFiltro({ ...filtro, profesional_id: e.target.value })}
+            className={`${baseFieldClasses} md:col-span-2`}
+          >
+            <option value="">Filtrar profesional</option>
+            {profesionales.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.nombre}
+              </option>
+            ))}
+          </select>
+
+          <select
+            value={filtro.estado}
+            onChange={(e) => setFiltro({ ...filtro, estado: e.target.value })}
+            className={baseFieldClasses}
+          >
+            <option value="">Estado</option>
+            {estadoOpciones.map((estado) => (
+              <option key={estado} value={estado}>
+                {estado}
+              </option>
+            ))}
+          </select>
+
+          <input
+            type="datetime-local"
+            value={filtro.desde}
+            onChange={(e) => setFiltro({ ...filtro, desde: e.target.value })}
+            className={baseFieldClasses}
+          />
+          <input
+            type="datetime-local"
+            value={filtro.hasta}
+            onChange={(e) => setFiltro({ ...filtro, hasta: e.target.value })}
+            className={baseFieldClasses}
+          />
+          <input
+            placeholder="DNI paciente"
+            value={filtro.paciente_dni}
+            onChange={(e) => setFiltro({ ...filtro, paciente_dni: e.target.value })}
+            className={baseFieldClasses}
+          />
+        </div>
+
+        <div className="flex flex-wrap gap-3">
+          <button type="button" onClick={aplicarFiltros} className={primaryButton}>
+            Aplicar filtros
+          </button>
+          <button type="button" onClick={limpiarFiltros} className={subtleButton}>
+            Limpiar
+          </button>
+        </div>
+      </section>
+
+      {/* Alta */}
+      <section className="space-y-6">
+        <div>
+          <h3 className="text-lg font-semibold text-slate-800">Crear turno</h3>
+          <p className="mt-1 text-sm text-slate-600">
+            Completa el formulario para generar un nuevo turno y asignarlo al profesional correspondiente.
+          </p>
+        </div>
+
+        <form onSubmit={onSubmit} className="grid gap-4 md:max-w-3xl">
+          <select
+            name="paciente_id"
+            value={form.paciente_id}
+            onChange={onChange}
+            required
+            className={baseFieldClasses}
+          >
+            <option value="">Paciente</option>
+            {pacientes.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.dni} - {p.nombre} {p.apellido}
+              </option>
+            ))}
+          </select>
+
+          <select
+            name="profesional_id"
+            value={form.profesional_id}
+            onChange={onChange}
+            required
+            className={baseFieldClasses}
+          >
+            <option value="">Profesional</option>
+            {profesionales.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.nombre} ({p.especialidad})
+              </option>
+            ))}
+          </select>
+
+          <select
+            name="servicio_id"
+            value={form.servicio_id}
+            onChange={onChange}
+            required
+            className={baseFieldClasses}
+          >
+            <option value="">Servicio</option>
+            {servicios.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.nombre} ({s.duracion_min}m)
+              </option>
+            ))}
+          </select>
+
+          <select
+            name="sucursal_id"
+            value={form.sucursal_id}
+            onChange={onChange}
+            required
+            className={baseFieldClasses}
+          >
+            <option value="">Sucursal</option>
+            {sucursales.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.nombre}
+              </option>
+            ))}
+          </select>
+
+          <input
+            name="fecha_hora_inicio"
+            type="datetime-local"
+            value={form.fecha_hora_inicio}
+            onChange={onChange}
+            required
+            className={baseFieldClasses}
+          />
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <input
+              name="monto"
+              type="number"
+              step="0.01"
+              value={form.monto}
+              onChange={onChange}
+              placeholder="Monto (opcional)"
+              className={baseFieldClasses}
+            />
+            <select
+              name="metodo"
+              value={form.metodo}
+              onChange={onChange}
+              className={baseFieldClasses}
+            >
+              <option value="efectivo">efectivo</option>
+              <option value="debito">debito</option>
+              <option value="credito">credito</option>
+              <option value="mp">mp</option>
+            </select>
+          </div>
+
+          <div className="flex justify-end">
+            <button type="submit" className={primaryButton}>
+              Crear turno
+            </button>
+          </div>
+        </form>
+      </section>
 
       {/* Listado */}
-      <table border="1" cellPadding="6" style={{ borderCollapse: "collapse" }}>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Paciente</th>
-            <th>Profesional</th>
-            <th>Servicio</th>
-            <th>Sucursal</th>
-            <th>Inicio</th>
-            <th>Fin</th>
-            <th>Estado</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {lista.map((t) => (
-            <tr key={t.id}>
-              <td>{t.id}</td>
-              <td>{t.paciente}</td>
-              <td>{t.profesional}</td>
-              <td>{t.servicio}</td>
-              <td>{t.sucursal}</td>
-              <td>{t.fecha_hora_inicio}</td>
-              <td>{t.fecha_hora_fin}</td>
-              <td>{t.estado}</td>
-              <td>
-                <button onClick={() => cambiarEstado(t.id, "confirmado")}>Confirmar</button>{" "}
-                <button onClick={() => cambiarEstado(t.id, "atendido")}>Atendido</button>{" "}
-                <button onClick={() => cambiarEstado(t.id, "cancelado")}>Cancelar</button>{" "}
-                <button onClick={() => reprogramar(t.id)}>Reprogramar</button>{" "}
-                <button onClick={() => eliminarTurno(t.id)} style={{ color: "crimson" }}>
-                  Eliminar
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <section className="space-y-4">
+        <div>
+          <h3 className="text-lg font-semibold text-slate-800">Turnos programados</h3>
+          <p className="mt-1 text-sm text-slate-600">
+            Gestiona los estados o reprograma turnos directamente desde el listado.
+          </p>
+        </div>
+        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-slate-200 text-left text-sm">
+              <thead className="bg-slate-50">
+                <tr>
+                  {["ID", "Paciente", "Profesional", "Servicio", "Sucursal", "Inicio", "Fin", "Estado", "Acciones"].map(
+                    (header) => (
+                      <th
+                        key={header}
+                        scope="col"
+                        className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500"
+                      >
+                        {header}
+                      </th>
+                    ),
+                  )}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-200 bg-white">
+                {lista.map((t) => (
+                  <tr key={t.id} className="hover:bg-slate-50/60">
+                    <td className="px-4 py-3 font-medium text-slate-700">{t.id}</td>
+                    <td className="px-4 py-3">{t.paciente}</td>
+                    <td className="px-4 py-3">{t.profesional}</td>
+                    <td className="px-4 py-3">{t.servicio}</td>
+                    <td className="px-4 py-3">{t.sucursal}</td>
+                    <td className="px-4 py-3">{t.fecha_hora_inicio}</td>
+                    <td className="px-4 py-3">{t.fecha_hora_fin}</td>
+                    <td className="px-4 py-3">
+                      <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-600">
+                        {t.estado}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex flex-wrap gap-2">
+                        <button
+                          type="button"
+                          onClick={() => cambiarEstado(t.id, "confirmado")}
+                          className={`${subtleButton} border-transparent bg-sky-50 text-sky-700 hover:bg-sky-100`}
+                        >
+                          Confirmar
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => cambiarEstado(t.id, "atendido")}
+                          className={`${subtleButton} border-transparent bg-emerald-50 text-emerald-700 hover:bg-emerald-100`}
+                        >
+                          Atendido
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => cambiarEstado(t.id, "cancelado")}
+                          className={`${subtleButton} border-transparent bg-amber-50 text-amber-700 hover:bg-amber-100`}
+                        >
+                          Cancelar
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => reprogramar(t.id)}
+                          className={`${subtleButton} border-transparent bg-slate-100 text-slate-700 hover:bg-slate-200`}
+                        >
+                          Reprogramar
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => eliminarTurno(t.id)}
+                          className={`${subtleButton} border-transparent bg-rose-50 text-rose-700 hover:bg-rose-100`}
+                        >
+                          Eliminar
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
