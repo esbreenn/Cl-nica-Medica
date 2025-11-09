@@ -5,6 +5,7 @@ import { saveAs } from "file-saver";
 
 /* -------------------- UI helpers -------------------- */
 function Card({ children }) {
+  // Contenedor estilizado que reutilizo en cada bloque de reporte.
   return (
     <section className="mb-8 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200/80">
       {children}
@@ -13,6 +14,7 @@ function Card({ children }) {
 }
 
 function SectionHeader({ title, onRefresh, loading, onExport }) {
+  // Encabezado con botones para refrescar datos o exportarlos.
   return (
     <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       <h3 className="text-lg font-semibold text-slate-800">{title}</h3>
@@ -49,6 +51,7 @@ function Button({ children, variant = "primary", className = "", ...props }) {
 }
 
 function Spinner() {
+  // Ícono animado para indicar carga.
   return (
     <svg
       className="h-4 w-4 animate-spin text-sky-600"
@@ -62,6 +65,7 @@ function Spinner() {
 }
 
 function Empty({ children = "Sin datos" }) {
+  // Mensaje de estado vacío para tablas sin registros.
   return (
     <div className="flex items-center justify-center rounded-xl border border-dashed border-slate-200 p-8 text-sm text-slate-500">
       {children}
@@ -70,6 +74,7 @@ function Empty({ children = "Sin datos" }) {
 }
 
 function DataTable({ cols, rows }) {
+  // Tabla genérica que arma las columnas en base a la configuración recibida.
   if (!rows?.length) return <Empty />;
   return (
     <div className="overflow-x-auto">
@@ -104,6 +109,7 @@ function DataTable({ cols, rows }) {
 
 /* -------------------- hook de reporte -------------------- */
 function useReporte(loaderFn) {
+  // Custom hook que centraliza la carga y exportación a Excel de cada reporte.
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -146,6 +152,7 @@ export default function Reportes() {
   );
 
   useEffect(() => {
+    // Disparo todos los reportes al montar para que el usuario vea datos de inmediato.
     repTurnosPaciente.cargar();
     repPacSinTurnos.cargar();
     repTurnosProfesional.cargar();

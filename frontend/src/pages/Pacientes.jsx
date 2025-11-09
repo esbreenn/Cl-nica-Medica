@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { api } from "../api/axios";
 
+// Clases de Tailwind que reutilizo en todos los inputs para mantener consistencia visual.
 const baseFieldClasses =
   "w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 shadow-sm transition focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500/60 disabled:cursor-not-allowed disabled:opacity-60";
 
 export default function Pacientes() {
+  // Estados locales para la lista y el formulario de alta.
   const [lista, setLista] = useState([]);
   const [form, setForm] = useState({
     dni: "",
@@ -18,6 +20,7 @@ export default function Pacientes() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  // Cargo los pacientes desde la API apenas se monta el componente.
   const cargar = async () => {
     const { data } = await api.get("/pacientes");
     setLista(data);
@@ -27,8 +30,10 @@ export default function Pacientes() {
     cargar();
   }, []);
 
+  // Manejo cambios del formulario con un único handler.
   const onChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
+  // Envío del formulario con manejo básico de errores y reseteo de campos.
   const onSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -58,6 +63,7 @@ export default function Pacientes() {
     }
   };
 
+  // Memorizar los encabezados evita recalcular el array en cada render.
   const tableHeaders = useMemo(
     () => ["ID", "DNI", "Nombre", "Apellido", "Obra social", "Teléfono"],
     [],
@@ -65,6 +71,7 @@ export default function Pacientes() {
 
   return (
     <div className="space-y-8">
+      {/* Formulario de alta de pacientes */}
       <form onSubmit={onSubmit} className="space-y-6">
         <div>
           <h3 className="text-lg font-semibold text-slate-800">Nuevo paciente</h3>
@@ -140,6 +147,7 @@ export default function Pacientes() {
         </div>
       </form>
 
+      {/* Tabla resumen con los pacientes registrados */}
       <div>
         <h3 className="mb-3 text-lg font-semibold text-slate-800">Listado</h3>
         <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
