@@ -1,16 +1,21 @@
+"""Reportes SQL para mostrar métricas rápidas de la clínica."""
+
 from fastapi import APIRouter
 from config.database import db
 
+# Creo un router separado para agrupar consultas más analíticas.
 router = APIRouter(
     prefix="/reportes",
     tags=["Reportes"]
 )
 
-# 1) INNER JOIN
+
 @router.get("/turnos_por_paciente")
 async def turnos_por_paciente():
+    """Reporte con INNER JOIN para ver quiénes son los pacientes con más turnos."""
+
     query = """
-        SELECT 
+        SELECT
             p.nombre AS paciente,
             p.apellido AS apellido,
             COUNT(t.id) AS total_turnos
@@ -21,9 +26,11 @@ async def turnos_por_paciente():
     """
     return await db.fetch_all(query)
 
-# 2) SUBCONSULTA
+
 @router.get("/pacientes_sin_turnos_recientes")
 async def pacientes_sin_turnos_recientes():
+    """Ejemplo de subconsulta para detectar pacientes inactivos en los últimos 30 días."""
+
     query = """
         SELECT nombre, apellido
         FROM pacientes
@@ -35,11 +42,13 @@ async def pacientes_sin_turnos_recientes():
     """
     return await db.fetch_all(query)
 
-# 3) GROUP BY
+
 @router.get("/turnos_por_profesional")
 async def turnos_por_profesional():
+    """Reporte con GROUP BY y LEFT JOIN para analizar la carga de turnos por profesional."""
+
     query = """
-        SELECT 
+        SELECT
             pr.nombre AS profesional,
             pr.especialidad,
             COUNT(t.id) AS total_turnos

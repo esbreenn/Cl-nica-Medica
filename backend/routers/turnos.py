@@ -1,11 +1,17 @@
+"""Endpoints relacionados con la administración de turnos."""
+
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import Optional, List
 from config.database import db
 
+# Router exclusivo para todo lo que tenga que ver con turnos.
 router = APIRouter(tags=["Turnos"], prefix="/turnos")
 
+
 class TurnoIn(BaseModel):
+    """Datos mínimos que necesito para reservar un turno y registrar un pago."""
+
     paciente_id: int
     profesional_id: int
     servicio_id: int
@@ -14,7 +20,10 @@ class TurnoIn(BaseModel):
     monto: Optional[float] = 0
     metodo: Optional[str] = "efectivo"
 
+
 class Turno(BaseModel):
+    """Modelo de salida con la información enriquecida que ve el frontend."""
+
     id: int
     paciente: str
     profesional: str
@@ -24,19 +33,27 @@ class Turno(BaseModel):
     fecha_hora_fin: str
     estado: str
 
+
 class TurnoUpdate(BaseModel):
+    """Información que se puede modificar al reprogramar un turno."""
+
     profesional_id: int
     servicio_id: int
     sucursal_id: int
     fecha_hora_inicio: str
-    
+
 
 class EstadoIn(BaseModel):
+    """Payload simple para actualizar el estado de un turno."""
+
     estado: str  # 'reservado' | 'confirmado' | 'atendido' | 'cancelado' | 'ausente'
+
 
 @router.patch("/{id}/estado")
 async def cambiar_estado(id: int, data: EstadoIn):
-    if data.estado not in {"reservado","confirmado","atendido","cancelado","ausente"}:
+    """Actualizo solo el estado de un turno validando valores permitidos y existencia."""
+
+    if data.estado not in {"reservado", "confirmado", "atendido", "cancelado", "ausente"}:
         raise HTTPException(400, "Estado inválido")
     if not await db.fetch_one("SELECT id FROM turnos WHERE id=:id", {"id": id}):
         raise HTTPException(404, "Turno no encontrado")
@@ -46,6 +63,8 @@ async def cambiar_estado(id: int, data: EstadoIn):
 
 @router.put("/{id}")
 async def reprogramar(id: int, data: TurnoUpdate):
+    """Llamo al stored procedure que ajusta agenda y horarios cuando movemos un turno."""
+
     try:
         row = await db.fetch_one(
             "CALL sp_reprogramar_turno(:id,:prof,:serv,:suc,:fecha);",
@@ -74,6 +93,8 @@ async def listar(
     hasta: str | None = None,
     paciente_dni: int | None = None
 ):
+    """Listado paginado de turnos con filtros por profesional, estado, rango de fechas o DNI."""
+
     base = """
     SELECT t.id,
            CONCAT(p.nombre,' ',p.apellido) AS paciente,
@@ -110,8 +131,11 @@ async def listar(
     q = base + " ORDER BY t.fecha_hora_inicio DESC LIMIT :limit OFFSET :offset"
     return await db.fetch_all(q, vals)
 
+
 @router.post("/")
 async def crear_turno(data: TurnoIn):
+    """Creo un turno nuevo usando un stored procedure que también registra el pago asociado."""
+
     try:
         row = await db.fetch_one(
             "CALL sp_crear_turno_con_pago(:paciente_id,:profesional_id,:servicio_id,:sucursal_id,:fecha,:monto,:metodo);",
@@ -131,23 +155,35 @@ async def crear_turno(data: TurnoIn):
             raise HTTPException(409, "Conflicto de agenda")
         raise HTTPException(400, "Error al crear turno")
 
+
 @router.get("/profesionales")
 async def listar_profesionales():
+    """Obtengo la lista de profesionales para poblar selectores en el frontend."""
+
     q = "SELECT id, nombre, especialidad FROM profesionales ORDER BY nombre"
     return await db.fetch_all(q)
 
+
 @router.get("/servicios")
 async def listar_servicios():
+    """Devuelvo los servicios activos para que el usuario seleccione la prestación adecuada."""
+
     q = "SELECT id, nombre, duracion_min FROM servicios WHERE activo=1 ORDER BY nombre"
     return await db.fetch_all(q)
 
+
 @router.get("/sucursales")
 async def listar_sucursales():
+    """Listado de sucursales activas de la clínica."""
+
     q = "SELECT id, nombre FROM sucursales WHERE activo=1 ORDER BY nombre"
     return await db.fetch_all(q)
 
+
 @router.delete("/{id}")
 async def eliminar(id: int):
+    """Borro un turno existente validando previamente que el id sea válido."""
+
     if not await db.fetch_one("SELECT id FROM turnos WHERE id=:id", {"id": id}):
         raise HTTPException(404, "Turno no encontrado")
     await db.execute("DELETE FROM turnos WHERE id=:id", {"id": id})

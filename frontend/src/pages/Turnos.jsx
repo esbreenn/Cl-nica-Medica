@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { api } from "../api/axios";
 
+// Utilizo constantes con las clases de Tailwind para mantener estilos consistentes.
 const baseFieldClasses =
   "w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 shadow-sm transition focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500/60 disabled:cursor-not-allowed disabled:opacity-60";
 
@@ -11,6 +12,7 @@ const primaryButton =
   "inline-flex items-center justify-center gap-2 rounded-lg bg-sky-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-sky-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-500 disabled:cursor-not-allowed disabled:bg-sky-300";
 
 export default function Turnos() {
+  // Estados para catálogos (combos) y listado principal.
   const [pacientes, setPacientes] = useState([]);
   const [profesionales, setProfesionales] = useState([]);
   const [servicios, setServicios] = useState([]);
@@ -39,6 +41,7 @@ export default function Turnos() {
 
   // -------- carga de combos + lista ----------
   const cargarCombos = async () => {
+    // Traigo todo en paralelo para que la pantalla cargue rápido.
     const [pacs, profs, servs, sucs] = await Promise.all([
       api.get("/pacientes"),
       api.get("/turnos/profesionales"),
@@ -150,7 +153,7 @@ export default function Turnos() {
 
   return (
     <div className="space-y-10">
-     
+
 
       {/* Alta */}
       <section className="space-y-6">
@@ -262,7 +265,7 @@ export default function Turnos() {
         </form>
       </section>
 
-      {/* Listado */}
+      {/* Listado principal con acciones por turno */}
       <section className="space-y-4">
         <div>
           <h3 className="text-lg font-semibold text-slate-800">Turnos programados</h3>
@@ -348,7 +351,9 @@ export default function Turnos() {
             </table>
           </div>
         </div>
-         {/* Filtros */}
+      </section>
+
+      {/* Filtros para buscar turnos específicos */}
       <section className="space-y-4 rounded-2xl border border-slate-200 bg-slate-50/70 p-4 shadow-sm">
         <div>
           <h3 className="text-lg font-semibold text-slate-800">Filtros</h3>
@@ -412,7 +417,6 @@ export default function Turnos() {
             Limpiar
           </button>
         </div>
-      </section>
       </section>
     </div>
     
