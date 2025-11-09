@@ -1,10 +1,12 @@
 import { useMemo, useState } from "react";
 import Pacientes from "./pages/Pacientes";
 import Turnos from "./pages/Turnos";
+import Reportes from "./pages/Reportes";
 
 const tabs = [
   { id: "pacientes", label: "Pacientes" },
   { id: "turnos", label: "Turnos" },
+  { id: "reportes", label: "Reportes" },
 ];
 
 export default function App() {
@@ -46,11 +48,11 @@ export default function App() {
         </header>
 
         <main className="flex-1 space-y-8">
-          <h2 className="text-xl font-semibold text-slate-700">
-            {activeTab}
-          </h2>
+          <h2 className="text-xl font-semibold text-slate-700">{activeTab}</h2>
           <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200/80">
-            {tab === "pacientes" ? <Pacientes /> : <Turnos />}
+            {tab === "pacientes" && <Pacientes />}
+            {tab === "turnos" && <Turnos />}
+            {tab === "reportes" && <Reportes />}
           </div>
         </main>
       </div>
