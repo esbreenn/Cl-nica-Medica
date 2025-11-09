@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from config.database import db
 from routers import pacientes, turnos
+from routers import pacientes, turnos, reportes
 import os
 
 app = FastAPI(title="Clínica - Gestión de Turnos")
@@ -11,6 +12,11 @@ app.add_middleware(
     allow_origins=["*"], allow_credentials=True,
     allow_methods=["*"], allow_headers=["*"]
 )
+
+
+app.include_router(pacientes.router, prefix="/api")
+app.include_router(turnos.router, prefix="/api")
+app.include_router(reportes.router, prefix="/api")
 
 @app.on_event("startup")
 async def startup(): await db.connect()
